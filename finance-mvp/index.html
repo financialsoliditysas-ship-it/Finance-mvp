@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MVP Finanzas</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main>
+      <section class="auth-view" id="authView">
+        <div class="brand-panel">
+          <p class="eyebrow">Finanzas para independientes y pequenos negocios</p>
+          <h1>Control financiero diario, claro y accionable.</h1>
+          <p>Registra ingresos, costos, gastos, caja, facturas y cuentas por pagar en una sola vista.</p>
+          <div class="metrics-strip">
+            <span><strong>4</strong> modulos</span>
+            <span><strong>12</strong> rubros base</span>
+            <span><strong>OCR</strong> demo</span>
+          </div>
+        </div>
+        <form class="login-card" id="loginForm">
+          <div>
+            <p class="eyebrow">Acceso demo</p>
+            <h2>Entrar al panel</h2>
+          </div>
+          <label>Usuario<input id="email" type="email" value="admin@negocio.com" required /></label>
+          <label>Contrasena<input id="password" type="password" value="demo1234" required /></label>
+          <button type="submit">Ingresar</button>
+          <p class="hint">Demo local. No guarda contrasenas ni envia datos a servidores.</p>
+        </form>
+      </section>
+
+      <section class="dashboard hidden" id="dashboardView">
+        <aside class="sidebar">
+          <div>
+            <p class="logo">F</p>
+            <h2>Finanzas MVP</h2>
+            <p class="muted">Panaderia La Aurora</p>
+            <nav>
+              <button class="active" data-tab="overview">Panel</button>
+              <button data-tab="transactions">Movimientos</button>
+              <button data-tab="capture">Factura</button>
+              <button data-tab="payables">Proveedores</button>
+            </nav>
+          </div>
+          <button class="ghost" id="logoutBtn">Salir</button>
+        </aside>
+
+        <section class="workspace">
+          <header class="topbar">
+            <div>
+              <p class="eyebrow">Septiembre 2026</p>
+              <h1>Tablero financiero</h1>
+            </div>
+            <button id="seedBtn">Cargar demo</button>
+          </header>
+
+          <section class="tab-panel" id="overview">
+            <div class="kpi-grid">
+              <article><span>Ingresos</span><strong id="incomeKpi">$0</strong></article>
+              <article><span>Costos</span><strong id="costKpi">$0</strong></article>
+              <article><span>Gastos</span><strong id="expenseKpi">$0</strong></article>
+              <article><span>Caja neta</span><strong id="cashKpi">$0</strong></article>
+            </div>
+            <div class="analytics">
+              <section>
+                <h3>Flujo de caja</h3>
+                <div class="chart" id="cashChart"></div>
+              </section>
+              <section>
+                <h3>Rubros principales</h3>
+                <div id="categoryList" class="category-list"></div>
+              </section>
+            </div>
+          </section>
+
+          <section class="tab-panel hidden" id="transactions">
+            <form class="entry-form" id="transactionForm">
+              <select id="type">
+                <option value="income">Ingreso / venta</option>
+                <option value="cost">Costo</option>
+                <option value="expense">Gasto</option>
+              </select>
+              <input id="description" placeholder="Descripcion" required />
+              <select id="category"></select>
+              <input id="amount" type="number" min="0" step="1000" placeholder="Valor" required />
+              <button type="submit">Agregar</button>
+            </form>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Tipo</th><th>Descripcion</th><th>Rubro</th><th>Valor</th></tr></thead>
+                <tbody id="transactionRows"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="tab-panel hidden" id="capture">
+            <div class="capture-layout">
+              <label class="upload-box">
+                <input id="receiptInput" type="file" accept="image/*" />
+                <span>Tomar o subir foto de factura</span>
+              </label>
+              <div class="receipt-preview" id="receiptPreview">
+                <p>La lectura OCR es demo: clasifica el gasto por palabras clave del nombre del archivo.</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="tab-panel hidden" id="payables">
+            <form class="entry-form" id="payableForm">
+              <input id="supplier" placeholder="Proveedor" required />
+              <input id="payableConcept" placeholder="Concepto" required />
+              <input id="payableAmount" type="number" min="0" step="1000" placeholder="Saldo" required />
+              <button type="submit">Registrar deuda</button>
+            </form>
+            <div class="payables" id="payablesList"></div>
+          </section>
+        </section>
+      </section>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>
