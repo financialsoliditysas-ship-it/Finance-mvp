@@ -44,6 +44,7 @@
               <button data-tab="capture">Factura</button>
               <button data-tab="payables">Proveedores</button>
               <button data-tab="settings">Ajustes</button>
+              <button data-tab="testing">Pruebas</button>
             </nav>
           </div>
           <button class="ghost" id="logoutBtn">Salir</button>
@@ -110,6 +111,27 @@
             <div class="payables" id="payablesList"></div>
           </section>
 
+
+          <section class="tab-panel hidden" id="testing">
+            <form class="testing-form" id="testForm">
+              <input id="testerName" placeholder="Nombre o perfil del tester" required />
+              <select id="testerType">
+                <option>Independiente</option>
+                <option>Panaderia</option>
+                <option>Tienda</option>
+                <option>Servicio pequeno</option>
+              </select>
+              <select id="testResult">
+                <option>Completo el flujo</option>
+                <option>Necesito ayuda</option>
+                <option>No entendio</option>
+              </select>
+              <input id="testDifficulty" type="number" min="1" max="5" value="3" />
+              <input id="testNotes" placeholder="Notas de observacion" />
+              <button type="submit">Guardar prueba</button>
+            </form>
+            <div class="test-list" id="testList"></div>
+          </section>
           <section class="tab-panel hidden" id="settings">
             <form class="settings-grid" id="settingsForm">
               <label>Negocio<input id="settingsBusiness" required /></label>

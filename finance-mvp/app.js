@@ -2,7 +2,7 @@ const categories = ["Ventas", "Arriendo", "Energia", "Agua", "Telefonia", "Inter
 const storageKey = "finanzas-mvp-v2";
 const money = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
 const $ = (id) => document.getElementById(id);
-let state = { businessName: "Panaderia La Aurora", openingCash: 300000, transactions: [], payables: [] };
+let state = { businessName: "Panaderia La Aurora", openingCash: 300000, transactions: [], payables: [], tests: [] };
 let editingTransactionId = null;
 
 function loadState() {
@@ -50,6 +50,7 @@ function render() {
   renderChart(t);
   renderCategories();
   renderPayables();
+  renderTests();
 }
 
 function renderInsights(t) {
@@ -86,6 +87,13 @@ function renderCategories() {
 function renderPayables() {
   $("payablesList").innerHTML = state.payables.length ? state.payables.map((item) => `<article class="${item.paid ? "paid" : ""}"><div><strong>${item.supplier}</strong><p class="muted">${item.concept}${item.due ? " · vence " + item.due : ""}</p></div><strong>${money.format(item.amount)}</strong><button class="mini" data-pay="${item.id}">${item.paid ? "Reabrir" : "Pagado"}</button></article>`).join("") : "<p class='muted'>Sin saldos por pagar registrados.</p>";
   document.querySelectorAll("[data-pay]").forEach((button) => button.addEventListener("click", () => togglePayable(button.dataset.pay)));
+}
+
+
+function renderTests() {
+  const list = $("testList");
+  if (!list) return;
+  list.innerHTML = state.tests.length ? state.tests.map((item) => `<article><div><strong>${item.name}</strong><p class="muted">${item.type} · ${item.result} · dificultad ${item.difficulty}/5</p><p>${item.notes || "Sin notas"}</p></div><small>${new Date(item.createdAt).toLocaleDateString("es-CO")}</small></article>`).join("") : "<p class='muted'>Sin pruebas registradas todavia.</p>";
 }
 
 function upsertTransaction(type, description, category, amount) {
@@ -143,7 +151,7 @@ function guessCategory(fileName) {
 }
 
 function exportCsv() {
-  const lines = [["tipo", "descripcion", "rubro", "valor"], ...state.transactions.map((item) => [labelType(item.type), item.description, item.category, item.amount])];
+  const lines = [["tipo", "descripcion", "rubro", "valor"], ...state.transactions.map((item) => [labelType(item.type), item.description, item.category, item.amount]), [], ["pruebas", "perfil", "resultado", "dificultad", "notas"], ...state.tests.map((item) => [item.name, item.type, item.result, item.difficulty, item.notes])];
   const csv = lines.map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(",")).join("\n");
   const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
   const link = document.createElement("a");
@@ -173,10 +181,11 @@ document.addEventListener("DOMContentLoaded", () => {
   $("logoutBtn").addEventListener("click", () => { $("dashboardView").classList.add("hidden"); $("authView").classList.remove("hidden"); });
   $("transactionForm").addEventListener("submit", (event) => { event.preventDefault(); upsertTransaction($("type").value, $("description").value, $("category").value, Number($("amount").value)); event.currentTarget.reset(); });
   $("payableForm").addEventListener("submit", (event) => { event.preventDefault(); state.payables.unshift({ id: id(), supplier: $("supplier").value, concept: $("payableConcept").value, due: $("payableDue").value, amount: Number($("payableAmount").value), paid: false }); saveState(); event.currentTarget.reset(); render(); });
+  $("testForm").addEventListener("submit", (event) => { event.preventDefault(); state.tests.unshift({ id: id(), name: $("testerName").value, type: $("testerType").value, result: $("testResult").value, difficulty: $("testDifficulty").value, notes: $("testNotes").value, createdAt: new Date().toISOString() }); saveState(); event.currentTarget.reset(); render(); });
   $("settingsForm").addEventListener("submit", (event) => { event.preventDefault(); state.businessName = $("settingsBusiness").value.trim() || state.businessName; state.openingCash = Number($("openingCash").value || 0); saveState(); render(); });
   $("seedBtn").addEventListener("click", seedDemo);
   $("exportBtn").addEventListener("click", exportCsv);
-  $("clearBtn").addEventListener("click", () => { if (confirm("Borrar todos los datos de prueba de este navegador?")) { localStorage.removeItem(storageKey); state = { businessName: "Panaderia La Aurora", openingCash: 0, transactions: [], payables: [] }; render(); } });
+  $("clearBtn").addEventListener("click", () => { if (confirm("Borrar todos los datos de prueba de este navegador?")) { localStorage.removeItem(storageKey); state = { businessName: "Panaderia La Aurora", openingCash: 0, transactions: [], payables: [], tests: [] }; render(); } });
   $("receiptInput").addEventListener("change", (event) => {
     const file = event.target.files[0];
     if (!file) return;

@@ -138,3 +138,12 @@ th, td { padding: 14px; border-bottom: 1px solid var(--line); text-align: left; 
   .insights, .settings-grid, .pay-form { grid-template-columns: 1fr; }
   td:last-child { min-width: 150px; }
 }
+.testing-form { display: grid; grid-template-columns: 1.1fr 150px 170px 110px 1fr auto; gap: 10px; margin-bottom: 14px; }
+.test-list { display: grid; gap: 10px; }
+.test-list article { display: flex; justify-content: space-between; gap: 14px; border: 1px solid var(--line); border-radius: 8px; background: white; padding: 14px; }
+.test-list p { margin: 4px 0 0; }
+.test-list small { color: var(--muted); white-space: nowrap; }
+@media (max-width: 900px) {
+  .testing-form { grid-template-columns: 1fr; }
+  .test-list article { flex-direction: column; }
+}
