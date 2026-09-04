@@ -116,3 +116,25 @@ th, td { padding: 14px; border-bottom: 1px solid var(--line); text-align: left; 
   .sidebar nav { grid-template-columns: repeat(2, 1fr); }
   .kpi-grid, .entry-form { grid-template-columns: 1fr; }
 }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.secondary { background: var(--blue); }
+.danger { background: #b42318; margin-top: 16px; }
+.danger-text { color: #b42318 !important; }
+.insights { display: grid; grid-template-columns: repeat(3, minmax(180px, 1fr)); gap: 14px; margin-top: 14px; }
+.insights article { border: 1px solid var(--line); border-left: 4px solid var(--green); border-radius: 8px; background: white; padding: 14px; display: grid; gap: 6px; }
+.insights span { color: var(--muted); }
+.bar-wrap { height: 240px; display: grid; grid-template-rows: 1fr auto; align-items: end; gap: 8px; min-width: 58px; }
+.bar-wrap small { color: var(--muted); font-size: 0.72rem; text-align: center; }
+.mini { padding: 7px 9px; margin: 2px; border-radius: 6px; background: #eef4ff; color: #1849a9; font-size: 0.78rem; white-space: nowrap; }
+.pay-form { grid-template-columns: 1fr 1fr 150px 150px auto; }
+.paid { opacity: 0.62; }
+.paid strong:first-child { text-decoration: line-through; }
+.settings-grid { display: grid; grid-template-columns: 1fr 180px auto; gap: 12px; align-items: end; max-width: 780px; }
+.receipt-preview label { margin: 10px 0; }
+.receipt-preview button { margin-top: 8px; }
+@media (max-width: 900px) {
+  .topbar { align-items: flex-start; flex-direction: column; }
+  .actions, .actions button { width: 100%; }
+  .insights, .settings-grid, .pay-form { grid-template-columns: 1fr; }
+  td:last-child { min-width: 150px; }
+}

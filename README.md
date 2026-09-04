@@ -2,21 +2,26 @@
 
 Aplicacion web demo para organizar finanzas de independientes y pequenos negocios.
 
+## Version testeable
+
 Incluye:
 
-- Login demo local.
-- Dashboard de ingresos, costos, gastos y caja neta.
-- Registro de movimientos por rubro.
-- Carga de imagen de factura con clasificacion demo por nombre de archivo.
-- Registro de proveedores por pagar.
+- Login demo por negocio.
+- Dashboard de ingresos, costos, gastos, proveedores pendientes y caja disponible.
+- Persistencia local en el navegador para pruebas reales de varios dias en el mismo dispositivo.
+- Registro, edicion y borrado de movimientos.
+- Registro de proveedores por pagar y opcion para marcarlos como pagados.
+- Carga de foto de factura con revision antes de guardar el gasto.
+- Exportacion CSV de movimientos.
+- Ajuste de nombre de negocio y caja inicial.
 
-## Ejecutar
+## Prueba con usuarios
 
-Abrir `finance-mvp/index.html` directamente en el navegador.
+URL de produccion: https://finance-6iejo9m33-financial-soliditys-projects.vercel.app/
 
-Para despliegue en Vercel:
+Credenciales demo sugeridas:
 
-```bash
-npm install
-npm run build
-```
+- Usuario: admin@negocio.com
+- Contrasena: demo1234
+
+Nota: esta version guarda datos solo en el navegador del usuario. No debe usarse aun para informacion sensible o como sistema contable definitivo.

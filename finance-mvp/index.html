@@ -3,31 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MVP Finanzas</title>
+    <title>Finanzas MVP</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <main>
       <section class="auth-view" id="authView">
         <div class="brand-panel">
-          <p class="eyebrow">Finanzas para independientes y pequenos negocios</p>
-          <h1>Control financiero diario, claro y accionable.</h1>
-          <p>Registra ingresos, costos, gastos, caja, facturas y cuentas por pagar en una sola vista.</p>
+          <p class="eyebrow">MVP financiero para negocios pequenos</p>
+          <h1>Ordena ventas, gastos, caja y proveedores en minutos.</h1>
+          <p>Un panel sencillo para independientes, tiendas y panaderias que necesitan saber cuanto entra, cuanto sale y que queda por pagar.</p>
           <div class="metrics-strip">
-            <span><strong>4</strong> modulos</span>
-            <span><strong>12</strong> rubros base</span>
-            <span><strong>OCR</strong> demo</span>
+            <span><strong>V2</strong> testeable</span>
+            <span><strong>Local</strong> persistente</span>
+            <span><strong>CSV</strong> exportable</span>
           </div>
         </div>
         <form class="login-card" id="loginForm">
           <div>
             <p class="eyebrow">Acceso demo</p>
-            <h2>Entrar al panel</h2>
+            <h2>Entrar al negocio</h2>
           </div>
+          <label>Nombre del negocio<input id="businessName" value="Panaderia La Aurora" required /></label>
           <label>Usuario<input id="email" type="email" value="admin@negocio.com" required /></label>
           <label>Contrasena<input id="password" type="password" value="demo1234" required /></label>
           <button type="submit">Ingresar</button>
-          <p class="hint">Demo local. No guarda contrasenas ni envia datos a servidores.</p>
+          <p class="hint">Para test real guarda los datos en este navegador. No envia informacion a servidores.</p>
         </form>
       </section>
 
@@ -36,12 +37,13 @@
           <div>
             <p class="logo">F</p>
             <h2>Finanzas MVP</h2>
-            <p class="muted">Panaderia La Aurora</p>
+            <p class="muted" id="businessLabel">Negocio</p>
             <nav>
               <button class="active" data-tab="overview">Panel</button>
               <button data-tab="transactions">Movimientos</button>
               <button data-tab="capture">Factura</button>
               <button data-tab="payables">Proveedores</button>
+              <button data-tab="settings">Ajustes</button>
             </nav>
           </div>
           <button class="ghost" id="logoutBtn">Salir</button>
@@ -50,10 +52,13 @@
         <section class="workspace">
           <header class="topbar">
             <div>
-              <p class="eyebrow">Septiembre 2026</p>
+              <p class="eyebrow" id="periodLabel">Mes actual</p>
               <h1>Tablero financiero</h1>
             </div>
-            <button id="seedBtn">Cargar demo</button>
+            <div class="actions">
+              <button class="secondary" id="exportBtn">Exportar CSV</button>
+              <button id="seedBtn">Cargar demo</button>
+            </div>
           </header>
 
           <section class="tab-panel" id="overview">
@@ -61,8 +66,9 @@
               <article><span>Ingresos</span><strong id="incomeKpi">$0</strong></article>
               <article><span>Costos</span><strong id="costKpi">$0</strong></article>
               <article><span>Gastos</span><strong id="expenseKpi">$0</strong></article>
-              <article><span>Caja neta</span><strong id="cashKpi">$0</strong></article>
+              <article><span>Caja disponible</span><strong id="cashKpi">$0</strong></article>
             </div>
+            <div class="insights" id="insights"></div>
             <div class="analytics">
               <section>
                 <h3>Flujo de caja</h3>
@@ -77,44 +83,40 @@
 
           <section class="tab-panel hidden" id="transactions">
             <form class="entry-form" id="transactionForm">
-              <select id="type">
-                <option value="income">Ingreso / venta</option>
-                <option value="cost">Costo</option>
-                <option value="expense">Gasto</option>
-              </select>
+              <select id="type"><option value="income">Ingreso / venta</option><option value="cost">Costo</option><option value="expense">Gasto</option></select>
               <input id="description" placeholder="Descripcion" required />
               <select id="category"></select>
               <input id="amount" type="number" min="0" step="1000" placeholder="Valor" required />
-              <button type="submit">Agregar</button>
+              <button type="submit" id="transactionSubmit">Agregar</button>
             </form>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>Tipo</th><th>Descripcion</th><th>Rubro</th><th>Valor</th></tr></thead>
-                <tbody id="transactionRows"></tbody>
-              </table>
-            </div>
+            <div class="table-wrap"><table><thead><tr><th>Tipo</th><th>Descripcion</th><th>Rubro</th><th>Valor</th><th></th></tr></thead><tbody id="transactionRows"></tbody></table></div>
           </section>
 
           <section class="tab-panel hidden" id="capture">
             <div class="capture-layout">
-              <label class="upload-box">
-                <input id="receiptInput" type="file" accept="image/*" />
-                <span>Tomar o subir foto de factura</span>
-              </label>
-              <div class="receipt-preview" id="receiptPreview">
-                <p>La lectura OCR es demo: clasifica el gasto por palabras clave del nombre del archivo.</p>
-              </div>
+              <label class="upload-box"><input id="receiptInput" type="file" accept="image/*" /><span>Tomar o subir foto de factura</span></label>
+              <div class="receipt-preview" id="receiptPreview"><p>Sube una foto. La app sugerira rubro y valor demo para que la persona confirme antes de guardar.</p></div>
             </div>
           </section>
 
           <section class="tab-panel hidden" id="payables">
-            <form class="entry-form" id="payableForm">
+            <form class="entry-form pay-form" id="payableForm">
               <input id="supplier" placeholder="Proveedor" required />
               <input id="payableConcept" placeholder="Concepto" required />
+              <input id="payableDue" type="date" />
               <input id="payableAmount" type="number" min="0" step="1000" placeholder="Saldo" required />
               <button type="submit">Registrar deuda</button>
             </form>
             <div class="payables" id="payablesList"></div>
+          </section>
+
+          <section class="tab-panel hidden" id="settings">
+            <form class="settings-grid" id="settingsForm">
+              <label>Negocio<input id="settingsBusiness" required /></label>
+              <label>Caja inicial<input id="openingCash" type="number" step="1000" min="0" /></label>
+              <button type="submit">Guardar ajustes</button>
+            </form>
+            <button class="danger" id="clearBtn">Borrar datos de prueba</button>
           </section>
         </section>
       </section>
