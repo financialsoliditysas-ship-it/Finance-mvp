@@ -9,7 +9,7 @@ Incluye:
 - Login demo por negocio.
 - Dashboard de ingresos, costos, gastos, proveedores pendientes y caja disponible.
 - Persistencia local en el navegador para pruebas reales de varios dias en el mismo dispositivo.
-- Registro, edicion y borrado de movimientos.
+- Registro, edicion y borrado de movimientos con fecha.
 - Registro de proveedores por pagar y opcion para marcarlos como pagados.
 - Carga de foto de factura con revision antes de guardar el gasto.
 - Exportacion CSV de movimientos.

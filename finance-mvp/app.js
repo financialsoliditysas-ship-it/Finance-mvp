@@ -13,6 +13,9 @@ function saveState() { localStorage.setItem(storageKey, JSON.stringify(state)); 
 function id() { return crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()); }
 function labelType(type) { return { income: "Ingreso", cost: "Costo", expense: "Gasto" }[type]; }
 function initCategories() { $("category").innerHTML = categories.map((category) => `<option>${category}</option>`).join(""); }
+function today() { return new Date().toISOString().slice(0, 10); }
+function movementDate(item) { return item.date || (item.createdAt ? item.createdAt.slice(0, 10) : today()); }
+function formatDate(value) { return new Date(value + "T00:00:00").toLocaleDateString("es-CO", { year: "numeric", month: "2-digit", day: "2-digit" }); }
 function monthLabel() { return new Date().toLocaleDateString("es-CO", { month: "long", year: "numeric" }); }
 
 function showDashboard() {
@@ -63,7 +66,7 @@ function renderInsights(t) {
 }
 
 function renderRows() {
-  $("transactionRows").innerHTML = state.transactions.map((item) => `<tr><td>${labelType(item.type)}</td><td>${item.description}</td><td>${item.category}</td><td>${money.format(item.amount)}</td><td><button class="mini" data-edit="${item.id}">Editar</button><button class="mini danger-text" data-delete="${item.id}">Borrar</button></td></tr>`).join("");
+  $("transactionRows").innerHTML = state.transactions.map((item) => `<tr><td>${formatDate(movementDate(item))}</td><td>${labelType(item.type)}</td><td>${item.description}</td><td>${item.category}</td><td>${money.format(item.amount)}</td><td><button class="mini" data-edit="${item.id}">Editar</button><button class="mini danger-text" data-delete="${item.id}">Borrar</button></td></tr>`).join("");
   document.querySelectorAll("[data-edit]").forEach((button) => button.addEventListener("click", () => editTransaction(button.dataset.edit)));
   document.querySelectorAll("[data-delete]").forEach((button) => button.addEventListener("click", () => deleteTransaction(button.dataset.delete)));
 }
@@ -96,13 +99,13 @@ function renderTests() {
   list.innerHTML = state.tests.length ? state.tests.map((item) => `<article><div><strong>${item.name}</strong><p class="muted">${item.type} · ${item.result} · dificultad ${item.difficulty}/5</p><p>${item.notes || "Sin notas"}</p></div><small>${new Date(item.createdAt).toLocaleDateString("es-CO")}</small></article>`).join("") : "<p class='muted'>Sin pruebas registradas todavia.</p>";
 }
 
-function upsertTransaction(type, description, category, amount) {
+function upsertTransaction(type, description, category, amount, date = today()) {
   if (editingTransactionId) {
-    state.transactions = state.transactions.map((item) => item.id === editingTransactionId ? { ...item, type, description, category, amount } : item);
+    state.transactions = state.transactions.map((item) => item.id === editingTransactionId ? { ...item, type, description, category, amount, date } : item);
     editingTransactionId = null;
     $("transactionSubmit").textContent = "Agregar";
   } else {
-    state.transactions.unshift({ id: id(), type, description, category, amount, createdAt: new Date().toISOString() });
+    state.transactions.unshift({ id: id(), type, description, category, amount, date, createdAt: new Date().toISOString() });
   }
   saveState();
   render();
@@ -116,6 +119,7 @@ function editTransaction(itemId) {
   $("description").value = item.description;
   $("category").value = item.category;
   $("amount").value = item.amount;
+  $("movementDate").value = movementDate(item);
   $("transactionSubmit").textContent = "Guardar";
 }
 function deleteTransaction(itemId) { state.transactions = state.transactions.filter((item) => item.id !== itemId); saveState(); render(); }
@@ -124,12 +128,12 @@ function togglePayable(itemId) { state.payables = state.payables.map((item) => i
 function seedDemo() {
   state.openingCash = 300000;
   state.transactions = [
-    { id: id(), type: "income", description: "Ventas mostrador", category: "Ventas", amount: 2820000 },
-    { id: id(), type: "income", description: "Pedidos empresariales", category: "Ventas", amount: 1360000 },
-    { id: id(), type: "cost", description: "Harina y levadura", category: "Materias primas", amount: 920000 },
-    { id: id(), type: "expense", description: "Arriendo local", category: "Arriendo", amount: 1150000 },
-    { id: id(), type: "expense", description: "Energia", category: "Energia", amount: 360000 },
-    { id: id(), type: "expense", description: "Nomina auxiliar", category: "Salarios", amount: 980000 }
+    { id: id(), type: "income", description: "Ventas mostrador", category: "Ventas", amount: 2820000, date: "2026-09-01" },
+    { id: id(), type: "income", description: "Pedidos empresariales", category: "Ventas", amount: 1360000, date: "2026-09-03" },
+    { id: id(), type: "cost", description: "Harina y levadura", category: "Materias primas", amount: 920000, date: "2026-09-04" },
+    { id: id(), type: "expense", description: "Arriendo local", category: "Arriendo", amount: 1150000, date: "2026-09-01" },
+    { id: id(), type: "expense", description: "Energia", category: "Energia", amount: 360000, date: "2026-09-02" },
+    { id: id(), type: "expense", description: "Nomina auxiliar", category: "Salarios", amount: 980000, date: "2026-09-04" }
   ];
   state.payables = [
     { id: id(), supplier: "Molinos del Norte", concept: "Materia prima a 15 dias", due: "2026-09-15", amount: 640000, paid: false },
@@ -151,7 +155,7 @@ function guessCategory(fileName) {
 }
 
 function exportCsv() {
-  const lines = [["tipo", "descripcion", "rubro", "valor"], ...state.transactions.map((item) => [labelType(item.type), item.description, item.category, item.amount]), [], ["pruebas", "perfil", "resultado", "dificultad", "notas"], ...state.tests.map((item) => [item.name, item.type, item.result, item.difficulty, item.notes])];
+  const lines = [["fecha", "tipo", "descripcion", "rubro", "valor"], ...state.transactions.map((item) => [movementDate(item), labelType(item.type), item.description, item.category, item.amount]), [], ["pruebas", "perfil", "resultado", "dificultad", "notas"], ...state.tests.map((item) => [item.name, item.type, item.result, item.difficulty, item.notes])];
   const csv = lines.map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(",")).join("\n");
   const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
   const link = document.createElement("a");
@@ -176,10 +180,11 @@ document.addEventListener("DOMContentLoaded", () => {
   loadState();
   initCategories();
   bindTabs();
+  $("movementDate").value = today();
   $("businessName").value = state.businessName;
   $("loginForm").addEventListener("submit", (event) => { event.preventDefault(); showDashboard(); });
   $("logoutBtn").addEventListener("click", () => { $("dashboardView").classList.add("hidden"); $("authView").classList.remove("hidden"); });
-  $("transactionForm").addEventListener("submit", (event) => { event.preventDefault(); upsertTransaction($("type").value, $("description").value, $("category").value, Number($("amount").value)); event.currentTarget.reset(); });
+  $("transactionForm").addEventListener("submit", (event) => { event.preventDefault(); upsertTransaction($("type").value, $("description").value, $("category").value, Number($("amount").value), $("movementDate").value || today()); event.currentTarget.reset(); $("movementDate").value = today(); });
   $("payableForm").addEventListener("submit", (event) => { event.preventDefault(); state.payables.unshift({ id: id(), supplier: $("supplier").value, concept: $("payableConcept").value, due: $("payableDue").value, amount: Number($("payableAmount").value), paid: false }); saveState(); event.currentTarget.reset(); render(); });
   $("testForm").addEventListener("submit", (event) => { event.preventDefault(); state.tests.unshift({ id: id(), name: $("testerName").value, type: $("testerType").value, result: $("testResult").value, difficulty: $("testDifficulty").value, notes: $("testNotes").value, createdAt: new Date().toISOString() }); saveState(); event.currentTarget.reset(); render(); });
   $("settingsForm").addEventListener("submit", (event) => { event.preventDefault(); state.businessName = $("settingsBusiness").value.trim() || state.businessName; state.openingCash = Number($("openingCash").value || 0); saveState(); render(); });
@@ -191,8 +196,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!file) return;
     const category = guessCategory(file.name);
     const imgUrl = URL.createObjectURL(file);
-    $("receiptPreview").innerHTML = `<img src="${imgUrl}" alt="Factura cargada" /><h3>Revision de factura</h3><label>Descripcion<input id="receiptDesc" value="Factura: ${file.name}" /></label><label>Rubro<select id="receiptCategory">${categories.map((item) => `<option ${item === category ? "selected" : ""}>${item}</option>`).join("")}</select></label><label>Valor<input id="receiptAmount" type="number" value="85000" min="0" step="1000" /></label><button id="confirmReceipt">Guardar gasto</button>`;
-    $("confirmReceipt").addEventListener("click", () => upsertTransaction("expense", $("receiptDesc").value, $("receiptCategory").value, Number($("receiptAmount").value)));
+    $("receiptPreview").innerHTML = `<img src="${imgUrl}" alt="Factura cargada" /><h3>Revision de factura</h3><label>Descripcion<input id="receiptDesc" value="Factura: ${file.name}" /></label><label>Rubro<select id="receiptCategory">${categories.map((item) => `<option ${item === category ? "selected" : ""}>${item}</option>`).join("")}</select></label><label>Fecha<input id="receiptDate" type="date" value="${today()}" /></label><label>Valor<input id="receiptAmount" type="number" value="85000" min="0" step="1000" /></label><button id="confirmReceipt">Guardar gasto</button>`;
+    $("confirmReceipt").addEventListener("click", () => upsertTransaction("expense", $("receiptDesc").value, $("receiptCategory").value, Number($("receiptAmount").value), $("receiptDate").value || today()));
   });
   if (!state.transactions.length && !state.payables.length) seedDemo();
 });
