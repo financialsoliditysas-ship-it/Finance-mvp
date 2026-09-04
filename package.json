@@ -1,9 +1,0 @@
-{
-  "name": "finance-mvp",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "build": "node build.js"
-  }
-}
-
